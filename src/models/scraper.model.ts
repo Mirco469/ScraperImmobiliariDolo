@@ -8,3 +8,8 @@ export type ZoneHouses = {
   zone: string;
   houses: House[];
 };
+
+export type AgencyHouses = {
+  agency: string;
+  zones: ZoneHouses[];
+};

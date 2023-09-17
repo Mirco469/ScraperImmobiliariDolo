@@ -1,5 +1,5 @@
-import { ZoneHouses } from "../models/house.model";
+import { AgencyHouses } from "../models/scraper.model";
 
 export abstract class Scraper {
-  abstract run(): Promise<ZoneHouses[]>;
+  abstract run(): Promise<AgencyHouses>;
 }

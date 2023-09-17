@@ -2,9 +2,10 @@ import { Scraper } from "../scraper";
 import * as cheerio from "cheerio";
 import axios from "axios";
 import { SearchOptions } from "./orange.model";
-import { House } from "../../models/house.model";
+import { House } from "../../models/scraper.model";
 
 export class OrangeScraper extends Scraper {
+  agencyName = "Orange";
   website = "http://www.orangeimmobiliare.it";
   searchUrl = "cerca-immobile_C.asp";
 
@@ -60,10 +61,15 @@ export class OrangeScraper extends Scraper {
   public async run() {
     const zones = ["Dolo", "Pianiga"];
 
-    const zoneHouses = zones.map((zone) =>
+    const zoneHousesPromises = zones.map((zone) =>
       this.getZoneHouses(zone).then((houses) => ({ zone, houses }))
     );
 
-    return Promise.all(zoneHouses);
+    const zoneHouses = await Promise.all(zoneHousesPromises);
+
+    return {
+      agency: this.agencyName,
+      zones: zoneHouses,
+    };
   }
 }
