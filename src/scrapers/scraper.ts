@@ -1,4 +1,4 @@
-import { Agencies } from "../models/scraper.model";
+import { Agencies } from "./scraper.model";
 
 export abstract class Scraper {
   abstract run(): Promise<Agencies>;

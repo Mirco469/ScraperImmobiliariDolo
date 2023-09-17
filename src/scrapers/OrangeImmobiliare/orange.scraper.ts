@@ -2,10 +2,10 @@ import { Scraper } from "../scraper";
 import * as cheerio from "cheerio";
 import axios from "axios";
 import { SearchOptions } from "./orange.model";
-import { House, Houses } from "../../models/scraper.model";
+import { Houses } from "../scraper.model";
 
 export class OrangeScraper extends Scraper {
-  agencyName = "Orange";
+  agencyName = "OrangeImmobiliare";
   website = "http://www.orangeimmobiliare.it";
   searchUrl = "cerca-immobile_C.asp";
 

@@ -1,6 +1,6 @@
 import { NewEntity } from "./models/controller.model";
-import { Agencies } from "./models/scraper.model";
-import { OrangeScraper } from "./scrapers/Orange/orange.scraper";
+import { Agencies } from "./scrapers/scraper.model";
+import { OrangeScraper } from "./scrapers/OrangeImmobiliare/orange.scraper";
 import fs from "fs";
 
 export class Controller {
