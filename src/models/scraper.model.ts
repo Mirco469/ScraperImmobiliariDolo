@@ -1,15 +1,11 @@
+export type Houses = Record<string, House>;
+
 export type House = {
   title: string;
   url: string;
-  id: string;
+  found?: Date;
 };
 
-export type ZoneHouses = {
-  zone: string;
-  houses: House[];
-};
+export type Zones = Record<string, Houses>;
 
-export type AgencyHouses = {
-  agency: string;
-  zones: ZoneHouses[];
-};
+export type Agencies = Record<string, Zones>;

@@ -2,7 +2,7 @@ import { Scraper } from "../scraper";
 import * as cheerio from "cheerio";
 import axios from "axios";
 import { SearchOptions } from "./orange.model";
-import { House } from "../../models/scraper.model";
+import { House, Houses } from "../../models/scraper.model";
 
 export class OrangeScraper extends Scraper {
   agencyName = "Orange";
@@ -29,7 +29,7 @@ export class OrangeScraper extends Scraper {
     };
   }
 
-  private async getZoneHouses(comune: string): Promise<House[]> {
+  private async getZoneHouses(comune: string): Promise<Houses> {
     const queryParams = this.getQueryParams({
       comune,
     });
@@ -41,18 +41,17 @@ export class OrangeScraper extends Scraper {
 
     const housesHtml = $(".Titolo11Bianco");
 
-    const houses: House[] = [];
+    const houses: Houses = {};
     housesHtml.each((index, house) => {
       const title = $(house).find("a").text();
       const pageUrl: string = $(house).find("a").attr("href")!;
       const parsedUrl = new URL(pageUrl, this.website);
       const id = parsedUrl.searchParams.get("idUnita")!;
 
-      houses.push({
-        id,
+      houses[id] = {
         title,
         url: `${this.website}/${pageUrl}`,
-      });
+      };
     });
 
     return houses;
@@ -62,14 +61,17 @@ export class OrangeScraper extends Scraper {
     const zones = ["Dolo", "Pianiga"];
 
     const zoneHousesPromises = zones.map((zone) =>
-      this.getZoneHouses(zone).then((houses) => ({ zone, houses }))
+      this.getZoneHouses(zone).then((houses) => ({ [zone]: houses }))
     );
 
     const zoneHouses = await Promise.all(zoneHousesPromises);
 
+    const zoneHousesMerged = Object.assign({}, ...zoneHouses);
+
     return {
-      agency: this.agencyName,
-      zones: zoneHouses,
+      [this.agencyName]: {
+        ...zoneHousesMerged,
+      },
     };
   }
 }
