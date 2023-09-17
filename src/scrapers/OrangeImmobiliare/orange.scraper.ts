@@ -1,10 +1,9 @@
 import { Scraper } from "../scraper";
 import * as cheerio from "cheerio";
 import axios from "axios";
-import { SearchOptions } from "./orange.model";
-import { Houses } from "../scraper.model";
+import { Houses, SearchOptions } from "../scraper.model";
 
-export class OrangeScraper extends Scraper {
+export class OrangeImmobiliareScraper extends Scraper {
   agencyName = "OrangeImmobiliare";
   website = "http://www.orangeimmobiliare.it";
   searchUrl = "cerca-immobile_C.asp";
@@ -12,7 +11,7 @@ export class OrangeScraper extends Scraper {
   private getQueryParams(searchOptions: SearchOptions) {
     return {
       idComune: "",
-      Comune: searchOptions.comune,
+      Comune: searchOptions.zone,
       VenditaAffitto: "Vendita",
       comuneName: "",
       PrezzoDa: 0,
@@ -29,9 +28,9 @@ export class OrangeScraper extends Scraper {
     };
   }
 
-  private async getZoneHouses(comune: string): Promise<Houses> {
+  private async getZoneHouses(zone: string): Promise<Houses> {
     const queryParams = this.getQueryParams({
-      comune,
+      zone,
     });
     const response = await axios.get(`${this.website}/${this.searchUrl}`, {
       params: queryParams,

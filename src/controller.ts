@@ -1,12 +1,19 @@
 import { NewEntity } from "./models/controller.model";
 import { Agencies } from "./scrapers/scraper.model";
-import { OrangeScraper } from "./scrapers/OrangeImmobiliare/orange.scraper";
+import { OrangeImmobiliareScraper } from "./scrapers/OrangeImmobiliare/orange.scraper";
 import fs from "fs";
+import { StyleImmobiliareScraper } from "./scrapers/StyleImmobiliare/style.scraper";
 
 export class Controller {
   async run() {
-    const result = await new OrangeScraper().run();
-    this.checkNewEntriesAndSave(result);
+    const scrapersPromises = [
+      new OrangeImmobiliareScraper(),
+      new StyleImmobiliareScraper(),
+    ].map((scraper) => scraper.run());
+    const scrapersResults = await Promise.all(scrapersPromises);
+    const scraperMergedResults = Object.assign({}, ...scrapersResults);
+
+    this.checkNewEntriesAndSave(scraperMergedResults);
   }
 
   checkNewEntriesAndSave(scrapedAgencyHouses: Agencies) {
@@ -30,8 +37,10 @@ export class Controller {
       }
     }
 
-    console.log("New entries...");
-    console.table(newEntries);
+    console.log("Looking for new entries...");
+    newEntries.length > 0
+      ? console.table(newEntries)
+      : console.log("###  No new entires found  ###");
 
     this.save(scrapedAgencyHouses);
   }

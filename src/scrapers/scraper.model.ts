@@ -9,3 +9,8 @@ export type House = {
 export type Zones = Record<string, Houses>;
 
 export type Agencies = Record<string, Zones>;
+
+export type SearchOptions = {
+  zone: string;
+  page?: number;
+};
