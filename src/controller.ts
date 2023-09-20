@@ -32,6 +32,8 @@ export class Controller {
               url: house.url,
             });
             house.found = new Date();
+          } else {
+            house.found = savedHouses[agencyId][zoneId][houseId].found;
           }
         }
       }
