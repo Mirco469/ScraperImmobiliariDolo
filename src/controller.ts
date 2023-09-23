@@ -1,11 +1,17 @@
 import { NewEntity } from "./models/controller.model";
 import { Agencies } from "./models/scraper.model";
 import { OrangeImmobiliareScraper } from "./scrapers/OrangeImmobiliare/orange.scraper";
-import fs from "fs";
 import { StyleImmobiliareScraper } from "./scrapers/StyleImmobiliare/style.scraper";
 import { FaveroImmobiliareScraper } from "./scrapers/FaveroImmobiliare/favero.scraper";
+import { AgenciesFileSystem } from "./filesystem";
 
 export class Controller {
+  filesystem: AgenciesFileSystem;
+
+  constructor() {
+    this.filesystem = new AgenciesFileSystem("houses");
+  }
+
   async run() {
     const scrapersPromises = [
       new OrangeImmobiliareScraper(),
@@ -20,7 +26,7 @@ export class Controller {
 
   checkNewEntriesAndSave(scrapedAgencyHouses: Agencies) {
     const newEntries: NewEntity[] = [];
-    const savedHouses = this.load();
+    const savedHouses = this.filesystem.load();
 
     for (const [agencyId, zones] of Object.entries(scrapedAgencyHouses)) {
       for (const [zoneId, houses] of Object.entries(zones)) {
@@ -52,19 +58,6 @@ export class Controller {
       ? console.table(newEntries)
       : console.log("###  No new entires found  ###");
 
-    this.save(scrapedAgencyHouses);
-  }
-
-  load(): Agencies {
-    try {
-      const file = fs.readFileSync("houses.json", "utf8");
-      return JSON.parse(file);
-    } catch (err) {
-      return {};
-    }
-  }
-
-  save(data: Agencies) {
-    fs.writeFileSync("houses.json", JSON.stringify(data, null, 4));
+    this.filesystem.save(scrapedAgencyHouses);
   }
 }

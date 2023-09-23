@@ -42,7 +42,6 @@ export class FaveroImmobiliareScraper extends Scraper {
 
   async scrapPage(searchOptions: SearchOptions): Promise<Houses> {
     const searchUrl = this.buildSearchUrl(searchOptions);
-    console.log(searchUrl);
     const response = await axios.get(searchUrl);
 
     const $ = cheerio.load(response.data);
