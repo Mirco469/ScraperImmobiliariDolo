@@ -3,9 +3,11 @@ import puppeteer, { Browser, Page } from "puppeteer";
 import { Houses, SearchOptions } from "../scraper.model";
 
 export class StyleImmobiliareScraper extends Scraper {
-  agencyName = "StyleImmobiliare";
-  website = "https://styleimmobiliare.com";
   browser!: Browser;
+
+  constructor() {
+    super("StyleImmobiliare", "https://styleimmobiliare.com");
+  }
 
   private getSearchUrl(searchOptions: SearchOptions) {
     searchOptions.page ??= 1;

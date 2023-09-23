@@ -4,9 +4,11 @@ import axios from "axios";
 import { Houses, SearchOptions } from "../scraper.model";
 
 export class OrangeImmobiliareScraper extends Scraper {
-  agencyName = "OrangeImmobiliare";
-  website = "http://www.orangeimmobiliare.it";
   searchUrl = "cerca-immobile_C.asp";
+
+  constructor() {
+    super("OrangeImmobiliare", "http://www.orangeimmobiliare.it");
+  }
 
   private getQueryParams(searchOptions: SearchOptions) {
     return {
