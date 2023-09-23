@@ -1,7 +1,11 @@
 import { Scraper } from "../scraper";
 import * as cheerio from "cheerio";
 import axios from "axios";
-import { Houses, ScrapOptions, SearchOptions } from "../scraper.model";
+import {
+  Houses,
+  ScrapOptions,
+  SearchOptions,
+} from "../../models/scraper.model";
 
 export class FaveroImmobiliareScraper extends Scraper {
   searchUrl = "ricercaimmobili";

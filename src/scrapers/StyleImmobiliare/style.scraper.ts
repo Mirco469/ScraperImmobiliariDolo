@@ -1,6 +1,10 @@
 import { Scraper } from "../scraper";
 import puppeteer, { Browser, Page } from "puppeteer";
-import { Houses, ScrapOptions, SearchOptions } from "../scraper.model";
+import {
+  Houses,
+  ScrapOptions,
+  SearchOptions,
+} from "../../models/scraper.model";
 
 export class StyleImmobiliareScraper extends Scraper {
   browser!: Browser;

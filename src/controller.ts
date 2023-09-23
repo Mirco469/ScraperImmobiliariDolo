@@ -1,5 +1,5 @@
 import { NewEntity } from "./models/controller.model";
-import { Agencies } from "./scrapers/scraper.model";
+import { Agencies } from "./models/scraper.model";
 import { OrangeImmobiliareScraper } from "./scrapers/OrangeImmobiliare/orange.scraper";
 import fs from "fs";
 import { StyleImmobiliareScraper } from "./scrapers/StyleImmobiliare/style.scraper";

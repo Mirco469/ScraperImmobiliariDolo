@@ -1,4 +1,9 @@
-import { Agencies, Houses, ScrapOptions, SearchOptions } from "./scraper.model";
+import {
+  Agencies,
+  Houses,
+  ScrapOptions,
+  SearchOptions,
+} from "../models/scraper.model";
 
 export abstract class Scraper {
   constructor(
