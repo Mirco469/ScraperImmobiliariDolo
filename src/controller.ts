@@ -3,12 +3,14 @@ import { Agencies } from "./scrapers/scraper.model";
 import { OrangeImmobiliareScraper } from "./scrapers/OrangeImmobiliare/orange.scraper";
 import fs from "fs";
 import { StyleImmobiliareScraper } from "./scrapers/StyleImmobiliare/style.scraper";
+import { FaveroImmobiliareScraper } from "./scrapers/FaveroImmobiliare/favero.scraper";
 
 export class Controller {
   async run() {
     const scrapersPromises = [
       new OrangeImmobiliareScraper(),
       new StyleImmobiliareScraper(),
+      new FaveroImmobiliareScraper(),
     ].map((scraper) => scraper.run());
     const scrapersResults = await Promise.all(scrapersPromises);
     const scraperMergedResults = Object.assign({}, ...scrapersResults);
