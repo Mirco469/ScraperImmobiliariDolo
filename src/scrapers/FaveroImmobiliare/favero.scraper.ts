@@ -1,33 +1,45 @@
 import { Scraper } from "../scraper";
 import * as cheerio from "cheerio";
 import axios from "axios";
-import { Houses, SearchOptions } from "../scraper.model";
+import { Houses, ScrapOptions, SearchOptions } from "../scraper.model";
 
 export class FaveroImmobiliareScraper extends Scraper {
   searchUrl = "ricercaimmobili";
 
   constructor() {
-    super("FaveroImmobiliare", "https://www.faveroimmobiliare.com/");
+    const scrapPagesOptions: ScrapOptions[] = [
+      { zone: "DOLO" },
+      { zone: "DOLO - frazione Arino" },
+      { zone: "PIANIGA - frazione Cazzago" },
+    ];
+    super(
+      "FaveroImmobiliare",
+      "https://www.faveroimmobiliare.com/",
+      scrapPagesOptions
+    );
   }
 
-  private getQueryParams(searchOptions: SearchOptions) {
-    searchOptions.page ??= 1;
-    return {
+  buildSearchUrl(searchOptions: SearchOptions) {
+    const queryParams = {
       codRif: "",
-      tipologia: 0,
-      superficie: 0,
+      tipologia: "0",
+      superficie: "0",
       localita: searchOptions.zone,
-      prezzo: 0,
-      tipo: 0,
-      pagina: searchOptions.page,
+      prezzo: "0",
+      tipo: "0",
+      pagina: (searchOptions.page ?? 1).toString(),
     };
+
+    return this.mergeUrlAndQueryParams(
+      `${this.website}/ricercaimmobili`,
+      queryParams
+    );
   }
 
-  private async getZoneHouses(searchOptions: SearchOptions): Promise<Houses> {
-    const queryParams = this.getQueryParams(searchOptions);
-    const response = await axios.get(`${this.website}/${this.searchUrl}`, {
-      params: queryParams,
-    });
+  async scrapPage(searchOptions: SearchOptions): Promise<Houses> {
+    const searchUrl = this.buildSearchUrl(searchOptions);
+    console.log(searchUrl);
+    const response = await axios.get(searchUrl);
 
     const $ = cheerio.load(response.data);
 
@@ -49,7 +61,7 @@ export class FaveroImmobiliareScraper extends Scraper {
 
     const hasNextPage = await this.hasNextPage($);
     if (hasNextPage) {
-      const nextPageHouses = await this.getZoneHouses({
+      const nextPageHouses = await this.scrapPage({
         zone: searchOptions.zone,
         page: searchOptions.page ? ++searchOptions.page : 2,
       });
@@ -70,27 +82,5 @@ export class FaveroImmobiliareScraper extends Scraper {
     }
     const totalPages = paginationText.match(/\d+ di \d+/)![0].split(" di ");
     return totalPages[0] !== totalPages[1];
-  }
-
-  public async run() {
-    const zones = [
-      "Dolo",
-      "DOLO - frazione Arino",
-      "PIANIGA - frazione Cazzago",
-    ];
-
-    const zoneHousesPromises = zones.map((zone) =>
-      this.getZoneHouses({ zone }).then((houses) => ({ [zone]: houses }))
-    );
-
-    const zoneHouses = await Promise.all(zoneHousesPromises);
-
-    const zoneHousesMerged = Object.assign({}, ...zoneHouses);
-
-    return {
-      [this.agencyName]: {
-        ...zoneHousesMerged,
-      },
-    };
   }
 }

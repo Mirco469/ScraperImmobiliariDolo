@@ -10,7 +10,10 @@ export type Zones = Record<string, Houses>;
 
 export type Agencies = Record<string, Zones>;
 
-export type SearchOptions = {
+export type ScrapOptions = {
   zone: string;
+};
+
+export type SearchOptions = ScrapOptions & {
   page?: number;
 };

@@ -1,16 +1,30 @@
 import { Scraper } from "../scraper";
 import puppeteer, { Browser, Page } from "puppeteer";
-import { Houses, SearchOptions } from "../scraper.model";
+import { Houses, ScrapOptions, SearchOptions } from "../scraper.model";
 
 export class StyleImmobiliareScraper extends Scraper {
   browser!: Browser;
 
   constructor() {
-    super("StyleImmobiliare", "https://styleimmobiliare.com");
+    const scrapPagesOptions: ScrapOptions[] = [
+      { zone: "Dolo" },
+      { zone: "Pianiga" },
+    ];
+    super(
+      "StyleImmobiliare",
+      "https://styleimmobiliare.com",
+      scrapPagesOptions
+    );
   }
 
-  private getSearchUrl(searchOptions: SearchOptions) {
-    searchOptions.page ??= 1;
+  async run() {
+    this.browser = await puppeteer.launch({ headless: "new" });
+    const result = await super.run();
+    await this.browser.close();
+    return result;
+  }
+
+  buildSearchUrl(searchOptions: SearchOptions) {
     let cityCode: string = "";
     switch (searchOptions.zone) {
       case "Dolo":
@@ -21,17 +35,25 @@ export class StyleImmobiliareScraper extends Scraper {
         break;
     }
 
-    return `https://styleimmobiliare.com/it/vendite/?cit=${cityCode}&p=${searchOptions.page}`;
+    const queryParams = {
+      cit: cityCode,
+      p: (searchOptions.page ?? 1).toString(),
+    };
+
+    return this.mergeUrlAndQueryParams(
+      `${this.website}/it/vendite`,
+      queryParams
+    );
   }
 
-  private async getZoneHouses(searchOptions: SearchOptions): Promise<Houses> {
+  async scrapPage(searchOptions: SearchOptions): Promise<Houses> {
     try {
-      const URL = this.getSearchUrl(searchOptions);
+      const searchUrl = this.buildSearchUrl(searchOptions);
 
       // Launch the headless browser
       const page = await this.browser.newPage();
       // Go to the webpage
-      await page.goto(URL);
+      await page.goto(searchUrl);
 
       await page.waitForSelector(".annuncio");
 
@@ -60,7 +82,7 @@ export class StyleImmobiliareScraper extends Scraper {
 
       const hasNextPage = await this.hasNextPage(page);
       if (hasNextPage) {
-        const nextPageHouses = await this.getZoneHouses({
+        const nextPageHouses = await this.scrapPage({
           zone: searchOptions.zone,
           page: searchOptions.page ? ++searchOptions.page : 2,
         });
@@ -88,29 +110,5 @@ export class StyleImmobiliareScraper extends Scraper {
     });
 
     return hasNextPage;
-  }
-
-  public async run() {
-    this.browser = await puppeteer.launch({ headless: "new" });
-
-    const zones = ["Dolo", "Pianiga"];
-
-    const zoneHousesPromises = zones.map((zone) =>
-      this.getZoneHouses({ zone }).then((houses) => ({
-        [zone]: houses,
-      }))
-    );
-
-    const zoneHouses = await Promise.all(zoneHousesPromises);
-
-    const zoneHousesMerged = Object.assign({}, ...zoneHouses);
-
-    await this.browser.close();
-
-    return {
-      [this.agencyName]: {
-        ...zoneHousesMerged,
-      },
-    };
   }
 }

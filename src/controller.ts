@@ -26,7 +26,9 @@ export class Controller {
       for (const [zoneId, houses] of Object.entries(zones)) {
         // If length === 0 the could be a problem with the scraper
         if (Object.entries(houses).length === 0) {
-          console.warn(`Warning: zero houses for agency ${agencyId}`);
+          console.warn(
+            `Warning: zero houses for agency ${agencyId} in zone ${zoneId}`
+          );
         }
         for (const [houseId, house] of Object.entries(houses)) {
           if (!savedHouses[agencyId]?.[zoneId]?.[houseId]) {

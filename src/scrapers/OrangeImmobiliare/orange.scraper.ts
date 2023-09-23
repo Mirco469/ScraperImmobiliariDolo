@@ -1,42 +1,49 @@
 import { Scraper } from "../scraper";
 import * as cheerio from "cheerio";
 import axios from "axios";
-import { Houses, SearchOptions } from "../scraper.model";
+import { Houses, ScrapOptions, SearchOptions } from "../scraper.model";
 
 export class OrangeImmobiliareScraper extends Scraper {
-  searchUrl = "cerca-immobile_C.asp";
-
   constructor() {
-    super("OrangeImmobiliare", "http://www.orangeimmobiliare.it");
+    const scrapPagesOptions: ScrapOptions[] = [
+      { zone: "Dolo" },
+      { zone: "Pianiga" },
+    ];
+    super(
+      "OrangeImmobiliare",
+      "http://www.orangeimmobiliare.it",
+      scrapPagesOptions
+    );
   }
 
-  private getQueryParams(searchOptions: SearchOptions) {
-    return {
+  buildSearchUrl(searchOptions: SearchOptions): string {
+    const queryParams = {
       idComune: "",
       Comune: searchOptions.zone,
       VenditaAffitto: "Vendita",
       comuneName: "",
-      PrezzoDa: 0,
-      PrezzoA: 99999999999999,
-      MQDa: 0,
-      MQA: 99999999999999999,
-      idTipologia: 0,
+      PrezzoDa: "0",
+      PrezzoA: "99999999999999",
+      MQDa: "0",
+      MQA: "99999999999999999",
+      idTipologia: "0",
       BoxGarage: "No",
       Giardino: "No",
       Terrazza: "No",
-      Servizi: 99,
+      Servizi: "99",
       m: "ci",
       ricerca: "ricerca",
     };
+
+    return this.mergeUrlAndQueryParams(
+      `${this.website}/cerca-immobile_C.asp`,
+      queryParams
+    );
   }
 
-  private async getZoneHouses(zone: string): Promise<Houses> {
-    const queryParams = this.getQueryParams({
-      zone,
-    });
-    const response = await axios.get(`${this.website}/${this.searchUrl}`, {
-      params: queryParams,
-    });
+  async scrapPage(searchOptions: SearchOptions): Promise<Houses> {
+    const searchUrl = this.buildSearchUrl(searchOptions);
+    const response = await axios.get(searchUrl);
 
     const $ = cheerio.load(response.data);
 
@@ -56,23 +63,5 @@ export class OrangeImmobiliareScraper extends Scraper {
     });
 
     return houses;
-  }
-
-  public async run() {
-    const zones = ["Dolo", "Pianiga"];
-
-    const zoneHousesPromises = zones.map((zone) =>
-      this.getZoneHouses(zone).then((houses) => ({ [zone]: houses }))
-    );
-
-    const zoneHouses = await Promise.all(zoneHousesPromises);
-
-    const zoneHousesMerged = Object.assign({}, ...zoneHouses);
-
-    return {
-      [this.agencyName]: {
-        ...zoneHousesMerged,
-      },
-    };
   }
 }
