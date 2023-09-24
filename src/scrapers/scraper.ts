@@ -4,6 +4,7 @@ import {
   ScrapOptions,
   SearchOptions,
 } from "../models/scraper.model";
+import merge from "lodash.merge";
 
 export abstract class Scraper {
   constructor(
@@ -13,13 +14,15 @@ export abstract class Scraper {
   ) {}
 
   public async run(): Promise<Agencies> {
-    const zoneHousesPromises = this.scrapPagesOptions.map(({ zone }) =>
-      this.scrapPage({ zone }).then((houses) => ({ [zone]: houses }))
+    const zoneHousesPromises = this.scrapPagesOptions.map((scrapOption) =>
+      this.scrapPage(scrapOption).then((houses) => ({
+        [scrapOption.zone]: houses,
+      }))
     );
 
     const zoneHouses = await Promise.all(zoneHousesPromises);
 
-    const zoneHousesMerged = Object.assign({}, ...zoneHouses);
+    const zoneHousesMerged = merge({}, ...zoneHouses);
 
     return {
       [this.agencyName]: {

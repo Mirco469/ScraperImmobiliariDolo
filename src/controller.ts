@@ -4,6 +4,7 @@ import { OrangeImmobiliareScraper } from "./scrapers/OrangeImmobiliare/orange.sc
 import { StyleImmobiliareScraper } from "./scrapers/StyleImmobiliare/style.scraper";
 import { FaveroImmobiliareScraper } from "./scrapers/FaveroImmobiliare/favero.scraper";
 import { AgenciesFileSystem } from "./filesystem";
+import { AsteAnnunciScraper } from "./scrapers/AsteaAnnunci/asteannunci.scraper";
 
 export class Controller {
   filesystem: AgenciesFileSystem;
@@ -17,6 +18,7 @@ export class Controller {
       new OrangeImmobiliareScraper(),
       new StyleImmobiliareScraper(),
       new FaveroImmobiliareScraper(),
+      new AsteAnnunciScraper(),
     ].map((scraper) => scraper.run());
     const scrapersResults = await Promise.all(scrapersPromises);
     const scraperMergedResults = Object.assign({}, ...scrapersResults);
@@ -33,6 +35,7 @@ export class Controller {
         // If length === 0 the could be a problem with the scraper
         if (Object.entries(houses).length === 0) {
           console.warn(
+            "\x1b[33m%s\x1b[0m",
             `Warning: zero houses for agency ${agencyId} in zone ${zoneId}`
           );
         }

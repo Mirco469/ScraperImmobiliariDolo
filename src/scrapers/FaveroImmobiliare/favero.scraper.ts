@@ -8,8 +8,6 @@ import {
 } from "../../models/scraper.model";
 
 export class FaveroImmobiliareScraper extends Scraper {
-  searchUrl = "ricercaimmobili";
-
   constructor() {
     const scrapPagesOptions: ScrapOptions[] = [
       { zone: "DOLO" },
@@ -18,7 +16,7 @@ export class FaveroImmobiliareScraper extends Scraper {
     ];
     super(
       "FaveroImmobiliare",
-      "https://www.faveroimmobiliare.com/",
+      "https://www.faveroimmobiliare.com",
       scrapPagesOptions
     );
   }
