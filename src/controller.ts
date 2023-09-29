@@ -5,6 +5,7 @@ import { StyleImmobiliareScraper } from "./scrapers/StyleImmobiliare/style.scrap
 import { FaveroImmobiliareScraper } from "./scrapers/FaveroImmobiliare/favero.scraper";
 import { AgenciesFileSystem } from "./filesystem";
 import { AsteAnnunciScraper } from "./scrapers/AsteaAnnunci/asteannunci.scraper";
+import { EmmeEnneScraper } from "./scrapers/EmmeEnne/emmeenne.scraper";
 
 export class Controller {
   filesystem: AgenciesFileSystem;
@@ -19,6 +20,7 @@ export class Controller {
       new StyleImmobiliareScraper(),
       new FaveroImmobiliareScraper(),
       new AsteAnnunciScraper(),
+      new EmmeEnneScraper(),
     ].map((scraper) => scraper.run());
     const scrapersResults = await Promise.all(scrapersPromises);
     const scraperMergedResults = Object.assign({}, ...scrapersResults);
