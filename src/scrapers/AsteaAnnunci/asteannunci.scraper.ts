@@ -51,6 +51,10 @@ export class AsteAnnunciScraper extends Scraper {
     housesHtml.each((index, house) => {
       const title = $(house).find(".card-title").text().trim();
       const pageUrl: string = $(house).find("a").attr("href")!;
+      if (!pageUrl) {
+        // Some cards are not houses
+        return;
+      }
       // /123/123/
       const parsedUrl = pageUrl.match(/\/\d+\/\d+\//)![0];
       // Remove first and last /
