@@ -14,27 +14,23 @@ export class AsteAnnunciScraper extends Scraper {
      * T: Terreno
      */
     const scrapPagesOptions: ScrapOptions[] = [
-      { zone: "Dolo", category: "A" },
-      { zone: "Dolo", category: "T" },
-      { zone: "Pianiga", category: "A" },
-      { zone: "Pianiga", category: "T" },
+      { zone: "Dolo", category: "case" },
+      { zone: "Dolo", category: "terreni" },
+      { zone: "Pianiga", category: "case" },
+      { zone: "Pianiga", category: "terreni" },
     ];
     super("AsteAnnunci", "https://www.asteannunci.it", scrapPagesOptions);
   }
 
   buildSearchUrl(searchOptions: SearchOptions) {
     const queryParams = {
-      tipologia_lotto: "immobiliare",
       limit: "36",
-      regione: "Veneto",
-      provincia: "Venezia",
       comune: searchOptions.zone,
-      tipologia: searchOptions.category!,
       page: (searchOptions.page ?? 1).toString(),
     };
 
     return this.mergeUrlAndQueryParams(
-      `${this.website}/aste/cerca`,
+      `${this.website}/aste-immobiliari/${searchOptions.category}/venezia`,
       queryParams
     );
   }
@@ -50,6 +46,7 @@ export class AsteAnnunciScraper extends Scraper {
     let houses: Houses = {};
     housesHtml.each((index, house) => {
       const title = $(house).find(".card-title").text().trim();
+      console.log(title);
       const pageUrl: string = $(house).find("a").attr("href")!;
       if (!pageUrl) {
         // Some cards are not houses
