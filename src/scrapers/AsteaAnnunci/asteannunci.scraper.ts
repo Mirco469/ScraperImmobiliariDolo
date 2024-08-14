@@ -46,7 +46,6 @@ export class AsteAnnunciScraper extends Scraper {
     let houses: Houses = {};
     housesHtml.each((index, house) => {
       const title = $(house).find(".card-title").text().trim();
-      console.log(title);
       const pageUrl: string = $(house).find("a").attr("href")!;
       if (!pageUrl) {
         // Some cards are not houses
